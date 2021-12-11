@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using ChiaWorks.FileChecker.Services;
+using ChiaWorks.FileChecker.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,7 +22,7 @@ namespace ChiaWorks.FileChecker
 
             InitializeObjects();
 
-            RunApp();
+            RunApp().GetAwaiter();
             SpinWait.SpinUntil(() => false);
         }
 
@@ -30,11 +32,12 @@ namespace ChiaWorks.FileChecker
             _logger.LogDebug("Objects initialized");
         }
 
-        private static void RunApp()
+        private static async Task RunApp()
         {
             try
             {
-
+                var duplicateFileService = _services.GetRequiredService<DuplicateFileService>();
+                await duplicateFileService.RunAsync();
             }
             catch (Exception e)
             {
@@ -46,14 +49,18 @@ namespace ChiaWorks.FileChecker
         private static void RegisterDependencies()
         {
             var builder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.Debug.json", optional: true, reloadOnChange: true);
+            ;
 
             _configuration = builder.Build();
 
             var serviceProvider = new ServiceCollection();
             serviceProvider.AddSingleton<DuplicateFileService>()
-                .AddLogging(config=>config.AddConsole().AddConfiguration(_configuration.GetSection("Logging")))
+                .AddLogging(config => config.AddConsole().AddConfiguration(_configuration.GetSection("Logging")))
                 ;
+
+            serviceProvider.Configure<DuplicateFileServiceSettings>(_configuration.GetSection(nameof(DuplicateFileServiceSettings)));
 
             _services = serviceProvider.BuildServiceProvider();
         }
