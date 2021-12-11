@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D2A73BAF-14C9-4745-83CC-87092D753C1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChiaWorks.FileChecker", "ChiaWorks.FileChecker\ChiaWorks.FileChecker.csproj", "{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B} = {D2A73BAF-14C9-4745-83CC-87092D753C1E}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
