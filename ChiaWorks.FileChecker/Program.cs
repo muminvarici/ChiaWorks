@@ -55,8 +55,8 @@ namespace ChiaWorks.FileChecker
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                _logger.LogCritical(e.Message);
+                _logger.LogCritical(e.ToJson());
             }
             finally
             {
@@ -74,7 +74,7 @@ namespace ChiaWorks.FileChecker
             _configuration = builder.Build();
 
             var serviceProvider = new ServiceCollection();
-            serviceProvider.AddSingleton<DuplicateFileService>()
+            serviceProvider.AddScoped<DuplicateFileService>()
                 .AddLogging(config => config.AddConsole().AddConfiguration(_configuration.GetSection("Logging")))
                 ;
 

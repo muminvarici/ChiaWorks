@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ChiaWorks.FileChecker.Extensions;
 using ChiaWorks.FileChecker.Settings;
@@ -17,6 +18,7 @@ namespace ChiaWorks.FileChecker.Services
         private readonly List<string> _filePaths;
         private readonly List<string> _fileNames;
         private readonly List<string> _duplicateFilePaths;
+        private Dictionary<string, string[]> _rawFiles;
 
         public DuplicateFileService(IOptions<DuplicateFileServiceSettings> settings,
             ILogger<DuplicateFileService> logger)
@@ -31,8 +33,47 @@ namespace ChiaWorks.FileChecker.Services
 
         public async Task RunAsync()
         {
+            if (_settings.SourcePaths == null)
+            {
+                _logger.LogError("There is no path to check");
+                return;
+            }
+            await GetFleListAsync();
             FindDuplicates();
             await SaveResultAsync();
+        }
+
+        private async Task GetFleListAsync()
+        {
+            _rawFiles = new Dictionary<string, string[]>();
+            var tasks = new List<Task>();
+            foreach (var item in _settings.SourcePaths)
+            {
+                if (!Directory.Exists(item))
+                {
+                    _logger.LogWarning($"Directory not exists: {item}");
+                    continue;
+                }
+
+                tasks.Add(Task.Run(() =>
+                {
+                    _logger.LogDebug($"Working on path: {item}");
+                    var files = Directory.GetFiles(item, _settings.SearchPattern, _settings.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                    if (files.Length == 0)
+                    {
+                        _logger.LogWarning($"Directory is empty: {item}");
+                        return;
+                    }
+
+                    while (!_rawFiles.TryAdd(item, files))
+                    {
+                        _logger.LogWarning($"Directory & contents couldn't add to dictionary: {item}");
+                        Thread.Sleep(500);
+                    }
+                }));
+            }
+
+            await Task.WhenAll(tasks.ToArray());
         }
 
         private async Task SaveResultAsync()
@@ -51,19 +92,11 @@ namespace ChiaWorks.FileChecker.Services
 
         private void FindDuplicates()
         {
-            if (_settings.SourcePaths == null)
+            foreach (var row in _rawFiles)
             {
-                _logger.LogError("There is no path to check");
-                return;
-            }
+                _logger.LogDebug($"Finding duplicates on path: {row.Key}");
 
-            foreach (var item in _settings.SourcePaths)
-            {
-                if (!Directory.Exists(item))
-                    continue;
-                var files = Directory.GetFiles(item, _settings.SearchPattern, _settings.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-                if (files.Length == 0)
-                    continue;
+                var files = row.Value;
                 var innerFileNames = files.Select(Path.GetFileName).ToList();
 
                 var duplicates = innerFileNames.Where(w => _fileNames.Contains(w))
