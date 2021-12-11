@@ -56,7 +56,7 @@ namespace ChiaWorks.FileChecker.Services
             {
                 if (!Directory.Exists(item))
                     continue;
-                var files = Directory.GetFiles(item, _settings.SerachPattern, _settings.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                var files = Directory.GetFiles(item, _settings.SearchPattern, _settings.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
                 if (files.Length == 0)
                     continue;
                 var innerFileNames = files.Select(Path.GetFileName).ToList();
