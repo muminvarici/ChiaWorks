@@ -7,7 +7,6 @@ using ChiaWorks.FileChecker.Extensions;
 using ChiaWorks.FileChecker.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace ChiaWorks.FileChecker.Services
 {
@@ -32,7 +31,7 @@ namespace ChiaWorks.FileChecker.Services
 
         public async Task RunAsync()
         {
-            await FindDuplicatesAsync();
+            FindDuplicates();
             await SaveResultAsync();
         }
 
@@ -50,8 +49,14 @@ namespace ChiaWorks.FileChecker.Services
             return comp;
         }
 
-        private Task FindDuplicatesAsync()
+        private void FindDuplicates()
         {
+            if (_settings.SourcePaths == null)
+            {
+                _logger.LogError("There is no path to check");
+                return;
+            }
+
             foreach (var item in _settings.SourcePaths)
             {
                 if (!Directory.Exists(item))
@@ -78,8 +83,6 @@ namespace ChiaWorks.FileChecker.Services
                 _fileNames.AddRange(innerFileNames);
                 _filePaths.AddRange(files);
             }
-
-            return Task.CompletedTask;
         }
     }
 }

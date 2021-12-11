@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
+using ChiaWorks.FileChecker.Extensions;
 using ChiaWorks.FileChecker.Services;
 using ChiaWorks.FileChecker.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Options;
+using Timer = System.Timers.Timer;
 
 namespace ChiaWorks.FileChecker
 {
@@ -15,6 +19,8 @@ namespace ChiaWorks.FileChecker
         private static ServiceProvider _services;
         private static ILogger<Program> _logger;
         private static IConfigurationRoot _configuration;
+        private static Timer _timer;
+        private static GeneralSettings _generalSettings;
 
         public static void Main(string[] args)
         {
@@ -22,7 +28,7 @@ namespace ChiaWorks.FileChecker
 
             InitializeObjects();
 
-            RunApp().GetAwaiter();
+            InnerRunApp().GetAwaiter();
             SpinWait.SpinUntil(() => false);
         }
 
@@ -30,10 +36,18 @@ namespace ChiaWorks.FileChecker
         {
             _logger = _services.GetRequiredService<ILogger<Program>>();
             _logger.LogDebug("Objects initialized");
+
+            _generalSettings = _services.GetRequiredService<IOptions<GeneralSettings>>().Value;
+            _timer = new Timer
+            {
+                Interval = TimeSpan.FromSeconds(_generalSettings.Interval.NonZero(10 * 60)).TotalMilliseconds
+            };
+            _timer.Elapsed += (sender, args) => { InnerRunApp().GetAwaiter(); };
         }
 
-        private static async Task RunApp()
+        private static async Task InnerRunApp()
         {
+            _timer.Stop();
             try
             {
                 var duplicateFileService = _services.GetRequiredService<DuplicateFileService>();
@@ -43,6 +57,10 @@ namespace ChiaWorks.FileChecker
             {
                 Console.WriteLine(e);
                 throw;
+            }
+            finally
+            {
+                _timer.Start();
             }
         }
 
@@ -61,6 +79,7 @@ namespace ChiaWorks.FileChecker
                 ;
 
             serviceProvider.Configure<DuplicateFileServiceSettings>(_configuration.GetSection(nameof(DuplicateFileServiceSettings)));
+            serviceProvider.Configure<GeneralSettings>(_configuration.GetSection(nameof(GeneralSettings)));
 
             _services = serviceProvider.BuildServiceProvider();
         }
