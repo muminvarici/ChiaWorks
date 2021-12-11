@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace ChiaWorks.FileChecker.Extensions
@@ -10,6 +12,7 @@ namespace ChiaWorks.FileChecker.Extensions
                 Formatting = Formatting.Indented
             };
 
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> items) => items == null || !items.Any();
         public static string ToJson(this object obj) => JsonConvert.SerializeObject(obj, settings: JsonFormatterSettings);
     }
 }

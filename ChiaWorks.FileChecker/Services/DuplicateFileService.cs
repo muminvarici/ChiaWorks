@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ChiaWorks.FileChecker.Extensions;
+using ChiaWorks.FileChecker.Services.FileListerService;
 using ChiaWorks.FileChecker.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,16 +15,21 @@ namespace ChiaWorks.FileChecker.Services
     public class DuplicateFileService
     {
         private readonly ILogger<DuplicateFileService> _logger;
+        private readonly IFileListerService _fileListerService;
         private readonly DuplicateFileServiceSettings _settings;
         private readonly List<string> _filePaths;
         private readonly List<string> _fileNames;
         private readonly List<string> _duplicateFilePaths;
         private Dictionary<string, string[]> _rawFiles;
+        private const string DuplicatefilesJsonPath = "duplicateFiles.json";
+
 
         public DuplicateFileService(IOptions<DuplicateFileServiceSettings> settings,
-            ILogger<DuplicateFileService> logger)
+            ILogger<DuplicateFileService> logger,
+            IFileListerService fileListerService)
         {
             _logger = logger;
+            _fileListerService = fileListerService;
             _settings = settings.Value;
 
             _filePaths = new List<string>();
@@ -38,38 +44,52 @@ namespace ChiaWorks.FileChecker.Services
                 _logger.LogError("There is no path to check");
                 return;
             }
+
+            _logger.LogDebug("Getting file list");
             await GetFleListAsync();
+            _logger.LogDebug("File list collected. finding duplicates...");
             FindDuplicates();
-            await SaveResultAsync();
+            if (!_duplicateFilePaths.IsNullOrEmpty())
+            {
+                _logger.LogDebug("Found duplicates. saving results...");
+                await SaveResultAsync();
+            }
+            else
+            {
+                _logger.LogDebug("There is no duplicates deleting file");
+                File.Delete(DuplicatefilesJsonPath);
+            }
         }
 
         private async Task GetFleListAsync()
         {
             _rawFiles = new Dictionary<string, string[]>();
             var tasks = new List<Task>();
-            foreach (var item in _settings.SourcePaths)
+            foreach (var path in _settings.SourcePaths)
             {
-                if (!Directory.Exists(item))
+                if (!_fileListerService.DirectoryExists(path))
                 {
-                    _logger.LogWarning($"Directory not exists: {item}");
+                    _logger.LogWarning($"Directory not exists: {path}");
                     continue;
                 }
 
                 tasks.Add(Task.Run(() =>
                 {
-                    _logger.LogDebug($"Working on path: {item}");
-                    var files = Directory.GetFiles(item, _settings.SearchPattern, _settings.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                    _logger.LogDebug($"Working on path: {path}");
+                    var files = _fileListerService.GetFileList(path, _settings.SearchPattern, _settings.Recursive);
                     if (files.Length == 0)
                     {
-                        _logger.LogWarning($"Directory is empty: {item}");
+                        _logger.LogWarning($"Directory is empty: {path}");
                         return;
                     }
 
-                    while (!_rawFiles.TryAdd(item, files))
+                    while (!_rawFiles.TryAdd(path, files))
                     {
-                        _logger.LogWarning($"Directory & contents couldn't add to dictionary: {item}");
+                        _logger.LogWarning($"Directory & contents couldn't add to dictionary: {path}");
                         Thread.Sleep(500);
                     }
+
+                    _logger.LogDebug($"Directory found {path} with {files.Length} files");
                 }));
             }
 
@@ -79,7 +99,7 @@ namespace ChiaWorks.FileChecker.Services
         private async Task SaveResultAsync()
         {
             _duplicateFilePaths.Sort(CustomSort);
-            await File.WriteAllTextAsync("duplicateFiles.json", _duplicateFilePaths.ToJson());
+            await File.WriteAllTextAsync(DuplicatefilesJsonPath, _duplicateFilePaths.ToJson());
         }
 
         private int CustomSort(string x, string y)
