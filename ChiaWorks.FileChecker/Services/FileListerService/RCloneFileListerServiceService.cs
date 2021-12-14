@@ -53,6 +53,7 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                 {
                     _logger.LogDebug($"Using mock file {fileName}");
                     commandResult = File.ReadAllText(fileName);
+                    _logger.LogDebug($"Command result: {commandResult}");
                 }
                 else
                 {
@@ -60,12 +61,16 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                     commandResult = _scriptRunner.RunCommand(command);
                     _logger.LogDebug($"Executing command {command}");
                     File.WriteAllText(fileName, commandResult);
+                    _logger.LogDebug($"Command result: {commandResult}");
                 }
             }
             else
             {
+                var command = RCloneCommands.ListFiles.Format(path, maxDeph);
                 _logger.LogDebug("RClone will list files, that may take much time");
-                commandResult = _scriptRunner.RunCommand(RCloneCommands.ListFiles.Format(path, maxDeph));
+                _logger.LogDebug($"Executing command {command}");
+                commandResult = _scriptRunner.RunCommand(command);
+                _logger.LogDebug($"Command result: {commandResult}");
             }
 
             return commandResult;
