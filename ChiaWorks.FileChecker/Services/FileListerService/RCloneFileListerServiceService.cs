@@ -29,9 +29,10 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
         public string[] GetFileList(string path, string searchPattern, bool searchRecursive)
         {
             var commandResult = GetCommandResult(path, searchRecursive);
+            _logger.LogDebug(commandResult);
             var result = ParseListResult(commandResult);
             searchPattern ??= "*.*";
-
+            _logger.LogDebug(result.ToJson());
             return result.ToArray();
             // return result.Where(w => Regex.IsMatch(w, searchPattern)).ToArray(); TODO implement search pattern
         }
@@ -71,6 +72,7 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
         {
             if (result.IsNullOrWhiteSpace() || result.Contains("error", StringComparison.InvariantCultureIgnoreCase))
             {
+                _logger.LogError("Rclone ParseListResult returning null");
                 return null;
             }
 
