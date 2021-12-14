@@ -46,7 +46,7 @@ namespace ChiaWorks.FileChecker.Services
             }
 
             _logger.LogDebug("Getting file list");
-            await GetFleListAsync();
+            await GetFileListAsync();
             _logger.LogDebug("File list collected. finding duplicates...");
             FindDuplicates();
             if (!_duplicateFilePaths.IsNullOrEmpty())
@@ -61,7 +61,7 @@ namespace ChiaWorks.FileChecker.Services
             }
         }
 
-        private async Task GetFleListAsync()
+        private async Task GetFileListAsync()
         {
             _rawFiles = new Dictionary<string, string[]>();
             var tasks = new List<Task>();
@@ -93,7 +93,10 @@ namespace ChiaWorks.FileChecker.Services
                 }));
             }
 
+            _logger.LogDebug("Waiting file collecting tasks to be completed...");
             await Task.WhenAll(tasks.ToArray());
+            _logger.LogDebug("Tasks completed.");
+
         }
 
         private async Task SaveResultAsync()

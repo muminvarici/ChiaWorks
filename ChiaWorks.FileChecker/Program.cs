@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using ChiaWorks.FileChecker.Extensions;
 using ChiaWorks.FileChecker.Services;
 using ChiaWorks.FileChecker.Services.FileListerService;
@@ -12,7 +11,6 @@ using ChiaWorks.FileChecker.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Options;
 using Timer = System.Timers.Timer;
 
@@ -33,7 +31,7 @@ namespace ChiaWorks.FileChecker
 
             InitializeObjects();
 
-            var awaiter = InnerRunApp().GetAwaiter();
+            var awaiter = InnerRunAppAsync().GetAwaiter();
             _lateLogs.ForEach(w => w.Invoke());
             if (_generalSettings.LoopCount == 1)
             {
@@ -59,10 +57,11 @@ namespace ChiaWorks.FileChecker
             {
                 Interval = TimeSpan.FromSeconds(_generalSettings.Interval.NonZero(10 * 60)).TotalMilliseconds
             };
-            _timer.Elapsed += (sender, args) => { InnerRunApp().GetAwaiter(); };
+            _timer.Elapsed += (sender, args) => { InnerRunAppAsync().GetAwaiter(); };
+            _logger.LogDebug("Timer initialized.");
         }
 
-        private static async Task InnerRunApp()
+        private static async Task InnerRunAppAsync()
         {
             _timer.Stop();
             try

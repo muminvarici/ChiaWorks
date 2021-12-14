@@ -89,6 +89,7 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
 
         public bool DirectoryExists(string path)
         {
+            _logger.LogDebug("Rclone DirectoryExists returned true");
             //todo implement in best way
             return true;
         }
