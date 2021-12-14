@@ -13,7 +13,7 @@ namespace ChiaWorks.FileChecker.Extensions
             return new string(charArray);
         }
 
-        public static bool IsNullOrWhiteSpace(this string str) => string.IsNullOrWhiteSpace(str);
+        public static bool IsNullOrWhiteSpace(this string str) => str != null && string.IsNullOrWhiteSpace(str);
         public static string Format(this string str, params object[] args) => string.Format(str, args);
     }
 }

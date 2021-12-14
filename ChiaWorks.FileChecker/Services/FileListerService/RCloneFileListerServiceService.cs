@@ -51,11 +51,14 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                 string fileName = $"{path.Split(':')[0]}_rcloneLsResult.txt";
                 if (File.Exists(fileName))
                 {
+                    _logger.LogDebug($"Using mock file {fileName}");
                     commandResult = File.ReadAllText(fileName);
                 }
                 else
                 {
-                    commandResult = _scriptRunner.RunCommand(RCloneCommands.ListFiles.Format(path, maxDeph));
+                    var command = RCloneCommands.ListFiles.Format(path, maxDeph);
+                    commandResult = _scriptRunner.RunCommand(command);
+                    _logger.LogDebug($"Executing command {command}");
                     File.WriteAllText(fileName, commandResult);
                 }
             }
@@ -72,6 +75,7 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
         {
             if (result.IsNullOrWhiteSpace() || result.Contains("error", StringComparison.InvariantCultureIgnoreCase))
             {
+                _logger.LogDebug(result);
                 _logger.LogError("Rclone ParseListResult returning null");
                 return null;
             }
