@@ -29,7 +29,6 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
         public string[] GetFileList(string path, string searchPattern, bool searchRecursive)
         {
             var commandResult = GetCommandResult(path, searchRecursive);
-            _logger.LogDebug(commandResult);
             var result = ParseListResult(commandResult);
             searchPattern ??= "*.*";
             _logger.LogDebug(result.ToJson());
@@ -53,7 +52,6 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                 {
                     _logger.LogDebug($"Using mock file {fileName}");
                     commandResult = File.ReadAllText(fileName);
-                    _logger.LogDebug($"Command result: {commandResult}");
                 }
                 else
                 {
@@ -61,7 +59,6 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                     commandResult = _scriptRunner.RunCommand(command);
                     _logger.LogDebug($"Executing command {command}");
                     File.WriteAllText(fileName, commandResult);
-                    _logger.LogDebug($"Command result: {commandResult}");
                 }
             }
             else
@@ -70,7 +67,6 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
                 _logger.LogDebug("RClone will list files, that may take much time");
                 _logger.LogDebug($"Executing command {command}");
                 commandResult = _scriptRunner.RunCommand(command);
-                _logger.LogDebug($"Command result: {commandResult}");
             }
 
             return commandResult;
@@ -88,7 +84,7 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
             var rows = result.Trim().Split("\n");
             return rows.Select(w =>
             {
-                var rowItems = w.Split(" ");
+                var rowItems = w.Trim().Replace(" (1)", "_(1)").Replace(" (2)", "_(2)").Split(" ");
                 if (rowItems.Length == 2)
                 {
                     return rowItems[1];
@@ -104,5 +100,11 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
             //todo implement in best way
             return true;
         }
+
+        public string GetDeleteFileScript(string root, string file) =>
+            $"rclone delete '{root}:/{file}' -P";
+
+        public string GetMoveFileScript(string root, string source, string target) =>
+            $"rclone move '{root}:/{source}' '{target}' -P";
     }
 }

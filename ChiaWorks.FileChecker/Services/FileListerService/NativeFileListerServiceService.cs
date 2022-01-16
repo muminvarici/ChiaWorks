@@ -8,5 +8,15 @@ namespace ChiaWorks.FileChecker.Services.FileListerService
             Directory.GetFiles(path, searchPattern, searchRecursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
         public bool DirectoryExists(string path) => Directory.Exists(path);
+
+        public string GetDeleteFileScript(string root, string file)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string GetMoveFileScript(string root, string file, string target)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
