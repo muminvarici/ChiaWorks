@@ -36,16 +36,16 @@ namespace ChiaWorks.FutureBot.Controllers
         [HttpPost]
         public IActionResult Buy([FromBody] NewBuyRequest request)
         {
-            var result = _futureService.Buy(request.Coin);
-            return Ok(result);
+            _futureService.Buy(request.Coin);
+            return Ok();
         }
 
         [Route("sell")]
         [HttpPost]
         public IActionResult Sell([FromBody] NewSellRequest request)
         {
-            var result = _futureService.Sell(request.Coin);
-            return Ok(result);
+            _futureService.Sell(request.Coin);
+            return Ok();
         }
 
         [Route("test")]

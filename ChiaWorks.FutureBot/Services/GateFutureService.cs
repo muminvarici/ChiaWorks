@@ -1,15 +1,19 @@
 using Io.Gate.GateApi.Api;
 using Io.Gate.GateApi.Model;
+using Microsoft.Extensions.Logging;
 
 namespace ChiaWorks.FutureBot.Services
 {
     public class GateFutureService : IFutureService
     {
         private readonly FuturesApi _futuresApi;
+        private readonly ILogger<GateFutureService> _logger;
 
-        public GateFutureService(FuturesApi futuresApi)
+        public GateFutureService(FuturesApi futuresApi,
+            ILogger<GateFutureService> logger)
         {
             _futuresApi = futuresApi;
+            _logger = logger;
         }
 
         public void Test()
@@ -24,11 +28,11 @@ namespace ChiaWorks.FutureBot.Services
             var position = _futuresApi.GetPosition(settle, contract);
         }
 
-        public string Buy(string coin)
+        public void Buy(string coin)
         {
+            _logger.LogInformation(coin);
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
-            return contract + " buy request";
             var order = new FuturesOrder(contract,
                 size: 5,
                 text: "t-api",
@@ -38,11 +42,12 @@ namespace ChiaWorks.FutureBot.Services
             var result = _futuresApi.CreateFuturesOrder(settle, order);
         }
 
-        public string Sell(string coin)
+        public void Sell(string coin)
         {
+            _logger.LogInformation(coin);
+
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
-            return contract + " sell request";
 
             var order = new FuturesOrder(contract,
                 size: -5,
@@ -50,7 +55,7 @@ namespace ChiaWorks.FutureBot.Services
                 price: "43108"
             );
 
-            var result = _futuresApi.CreateFuturesOrder(settle, order);
+            _futuresApi.CreateFuturesOrder(settle, order);
         }
     }
 }
