@@ -42,7 +42,7 @@ namespace ChiaWorks.FutureBot.Services
         {
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
-            return contract + " buy request";
+            return contract + " sell request";
 
             var order = new FuturesOrder(contract,
                 size: -5,
