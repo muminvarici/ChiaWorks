@@ -1,3 +1,5 @@
+using System;
+using ChiaWorks.FutureBot.Extensions;
 using ChiaWorks.FutureBot.Requests;
 using ChiaWorks.FutureBot.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +16,21 @@ namespace ChiaWorks.FutureBot.Controllers
         {
             _futureService = futureService;
         }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] NewCommonRequest request)
+        {
+            switch (request.Message?.ToLower())
+            {
+                case "buy":
+                    return Buy(new NewBuyRequest { Coin = request.Coin });
+                case "sell":
+                    return Sell(new NewSellRequest { Coin = request.Coin });
+                default:
+                    throw new NotImplementedException(request.Serialize());
+            }
+        }
+
 
         [Route("buy")]
         [HttpPost]

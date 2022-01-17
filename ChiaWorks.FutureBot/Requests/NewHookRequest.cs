@@ -12,4 +12,9 @@ namespace ChiaWorks.FutureBot.Requests
     public class NewBuyRequest : HookRequestBase
     {
     }
+    
+    public class NewCommonRequest : HookRequestBase
+    {
+        public string Message { get; set; }
+    }
 }
