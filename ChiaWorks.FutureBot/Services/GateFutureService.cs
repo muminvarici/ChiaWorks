@@ -1,3 +1,4 @@
+using ChiaWorks.FutureBot.Extensions;
 using Io.Gate.GateApi.Api;
 using Io.Gate.GateApi.Model;
 using Microsoft.Extensions.Logging;
@@ -28,21 +29,21 @@ namespace ChiaWorks.FutureBot.Services
             var position = _futuresApi.GetPosition(settle, contract);
         }
 
-        public void Buy(string coin)
+        public void Buy(string coin, float price)
         {
-            _logger.LogInformation(coin);
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
             var order = new FuturesOrder(contract,
                 size: 5,
                 text: "t-api",
-                price: "43108"
+                price: (price + price / 100).ToString()
             );
 
-            var result = _futuresApi.CreateFuturesOrder(settle, order);
+            var response=_futuresApi.CreateFuturesOrder(settle, order);
+            _logger.LogInformation(response?.Serialize());
         }
 
-        public void Sell(string coin)
+        public void Sell(string coin, float price)
         {
             _logger.LogInformation(coin);
 
@@ -52,10 +53,11 @@ namespace ChiaWorks.FutureBot.Services
             var order = new FuturesOrder(contract,
                 size: -5,
                 text: "t-api",
-                price: "43108"
+                price: (price - price / 100).ToString()
             );
 
-            _futuresApi.CreateFuturesOrder(settle, order);
+           var response= _futuresApi.CreateFuturesOrder(settle, order);
+           _logger.LogInformation(response?.Serialize());
         }
     }
 }

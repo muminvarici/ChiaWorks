@@ -3,6 +3,9 @@ namespace ChiaWorks.FutureBot.Requests
     public abstract class HookRequestBase
     {
         public string Coin { get; set; }
+        public FutureDirection Direction { get; set; }
+        public string Message { get; set; }
+        public float Price { get; set; }
     }
 
     public class NewSellRequest : HookRequestBase
@@ -15,9 +18,6 @@ namespace ChiaWorks.FutureBot.Requests
 
     public class NewCommonRequest : HookRequestBase
     {
-        public FutureDirection Direction { get; set; }
-        public string Message { get; set; }
-        public string Price { get; set; }
     }
 
     public enum FutureDirection

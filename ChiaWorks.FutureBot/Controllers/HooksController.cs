@@ -27,9 +27,9 @@ namespace ChiaWorks.FutureBot.Controllers
             switch (request.Direction)
             {
                 case FutureDirection.Buy:
-                    return Buy(new NewBuyRequest { Coin = request.Coin });
+                    return Buy(new NewBuyRequest { Coin = request.Coin, Price = request.Price });
                 case FutureDirection.Sell:
-                    return Sell(new NewSellRequest { Coin = request.Coin });
+                    return Sell(new NewSellRequest { Coin = request.Coin, Price = request.Price });
                 default:
                     throw new NotImplementedException(request.Serialize());
             }
@@ -48,7 +48,7 @@ namespace ChiaWorks.FutureBot.Controllers
         [HttpPost]
         public IActionResult Buy([FromBody] NewBuyRequest request)
         {
-            _futureService.Buy(request.Coin);
+            _futureService.Buy(request.Coin, request.Price);
             return Ok();
         }
 
@@ -56,15 +56,8 @@ namespace ChiaWorks.FutureBot.Controllers
         [HttpPost]
         public IActionResult Sell([FromBody] NewSellRequest request)
         {
-            _futureService.Sell(request.Coin);
+            _futureService.Sell(request.Coin, request.Price);
             return Ok();
         }
-        // [Route("test")]
-        // [HttpPost]
-        // public IActionResult Test([FromBody] NewSellRequest request)
-        // {
-        //     _futureService.Test();
-        //     return Ok();
-        // }
     }
 }

@@ -2,8 +2,8 @@ namespace ChiaWorks.FutureBot.Services
 {
     public interface IFutureService
     {
-        void Buy(string coin);
-        void Sell(string coin);
+        void Buy(string coin, float price);
+        void Sell(string coin , float price);
         void Test();
     }
 }
