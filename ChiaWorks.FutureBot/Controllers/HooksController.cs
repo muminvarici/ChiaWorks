@@ -48,7 +48,7 @@ namespace ChiaWorks.FutureBot.Controllers
         [HttpPost]
         public IActionResult Buy([FromBody] NewBuyRequest request)
         {
-            _futureService.Buy(request.Coin, request.Price);
+            _futureService.Buy(request.Coin, request.Price, 10);
             return Ok();
         }
 
@@ -56,7 +56,7 @@ namespace ChiaWorks.FutureBot.Controllers
         [HttpPost]
         public IActionResult Sell([FromBody] NewSellRequest request)
         {
-            _futureService.Sell(request.Coin, request.Price);
+            _futureService.Sell(request.Coin, request.Price, -10);
             return Ok();
         }
     }

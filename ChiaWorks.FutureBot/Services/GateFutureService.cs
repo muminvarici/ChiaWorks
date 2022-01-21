@@ -1,4 +1,6 @@
+using System;
 using ChiaWorks.FutureBot.Extensions;
+using ChiaWorks.FutureBot.Requests;
 using Io.Gate.GateApi.Api;
 using Io.Gate.GateApi.Model;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,7 @@ namespace ChiaWorks.FutureBot.Services
     {
         private readonly FuturesApi _futuresApi;
         private readonly ILogger<GateFutureService> _logger;
+        private static FutureDirection latestDirection;
 
         public GateFutureService(FuturesApi futuresApi,
             ILogger<GateFutureService> logger)
@@ -29,35 +32,47 @@ namespace ChiaWorks.FutureBot.Services
             var position = _futuresApi.GetPosition(settle, contract);
         }
 
-        public void Buy(string coin, float price)
+        public void Buy(string coin, float price, long size)
         {
+            if (latestDirection == FutureDirection.Buy)
+            {
+                _logger.LogInformation("no need to buy again");
+                return;
+            }
+
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
             var order = new FuturesOrder(contract,
-                size: 5,
+                size: Math.Abs(size),
                 text: "t-api",
                 price: (price + price / 100).ToString()
             );
 
-            var response=_futuresApi.CreateFuturesOrder(settle, order);
+            var response = _futuresApi.CreateFuturesOrder(settle, order);
             _logger.LogInformation(response?.Serialize());
+            latestDirection = FutureDirection.Buy;
         }
 
-        public void Sell(string coin, float price)
+        public void Sell(string coin, float price, long size)
         {
-            _logger.LogInformation(coin);
+            if (latestDirection == FutureDirection.Sell)
+            {
+                _logger.LogInformation("no need to sell again");
+                return;
+            }
 
             const string settle = "usdt"; // string | Settle currency
             var contract = $"{coin.ToUpper()}_USDT"; // string | Futures contract
 
             var order = new FuturesOrder(contract,
-                size: -5,
+                size: -Math.Abs(size),
                 text: "t-api",
                 price: (price - price / 100).ToString()
             );
 
-           var response= _futuresApi.CreateFuturesOrder(settle, order);
-           _logger.LogInformation(response?.Serialize());
+            var response = _futuresApi.CreateFuturesOrder(settle, order);
+            _logger.LogInformation(response?.Serialize());
+            latestDirection = FutureDirection.Sell;
         }
     }
 }
