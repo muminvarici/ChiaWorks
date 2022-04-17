@@ -27,7 +27,7 @@ public class PlotController : Controller
     // GET
     public async Task<IActionResult> Index()
     {
-        if (User.Identity is not { IsAuthenticated: true }) return RedirectToAction("");
+        if (User.Identity is not { IsAuthenticated: true }) return Redirect("/Identity/Account/Login");
         var user = await _userManager.FindByEmailAsync(User.Identity.Name);
         if (user == null) throw new AuthenticationException();
 

@@ -10,5 +10,5 @@ public class PlotInfo : EntityBase
     public DateTime CreatedOn { get; set; }//todo move to base
 
     [Display(Name = "Ip Address")]
-    public string IpAddress { get; set; }
+    public string? IpAddress { get; set; }
 }
