@@ -14,10 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services
-    .AddDefaultIdentity<IdentityUser>(options =>
-    {
-        options.SignIn.RequireConfirmedAccount = true;
-    })
+    .AddDefaultIdentity<IdentityUser>(options => { options.SignIn.RequireConfirmedAccount = true; })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
@@ -61,6 +58,9 @@ app.MapRazorPages();
 using (var scope =
        app.Services.CreateScope())
 using (var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-    context.Database.Migrate();
+{
+    if (context.Database.EnsureCreated())
+        context.Database.Migrate();
+}
 
 app.Run();

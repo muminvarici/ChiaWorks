@@ -1,13 +1,16 @@
 @using ChiaWorks.PlotTracking.Controllers.Api
-@model PlotInfo
+@model UserDevice
 
 
 <tr>
     <th scope="row">@Model.Id</th>
-    <td>@Model.Name</td>
     @if (User.IsInRole(WarmUpsController.AdminRoleName))
     {
         <td>@Model.IpAddress</td>
+    }
+    else
+    {
+        <td>@($"***.{Model.IpAddress.Remove(Model.IpAddress.LastIndexOf(".", StringComparison.Ordinal))}") </td>
     }
     <td>@Model.CreatedOn</td>
 </tr>

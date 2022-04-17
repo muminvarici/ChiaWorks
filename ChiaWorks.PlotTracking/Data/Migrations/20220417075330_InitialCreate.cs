@@ -23,6 +23,7 @@ namespace ChiaWorks.PlotTracking.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false),
                     UserId = table.Column<string>(maxLength: 50,nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true,defaultValue:DateTime.Now),
                     IpAddress = table.Column<string>(maxLength: 50,nullable: true)
                 },
                 constraints: table =>
