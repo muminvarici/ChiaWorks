@@ -452,3 +452,8 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+appsettings.Development.json
+app.db-wal
+app.db-shm
+*.Designer.cs
+*.db

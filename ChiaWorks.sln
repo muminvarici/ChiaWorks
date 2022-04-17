@@ -4,6 +4,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D2A73BAF-14C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChiaWorks.FileChecker", "ChiaWorks.FileChecker\ChiaWorks.FileChecker.csproj", "{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChiaWorks.PlotTracking", "ChiaWorks.PlotTracking\ChiaWorks.PlotTracking.csproj", "{BEC170C5-5FCA-4483-899E-270B21832ADF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,5 +19,13 @@ Global
 		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C93E94F1-3D7B-444A-BF7E-D05CFF7E944B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45B385E8-32C5-4CCD-BE0E-081A8CD66621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45B385E8-32C5-4CCD-BE0E-081A8CD66621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45B385E8-32C5-4CCD-BE0E-081A8CD66621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45B385E8-32C5-4CCD-BE0E-081A8CD66621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEC170C5-5FCA-4483-899E-270B21832ADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEC170C5-5FCA-4483-899E-270B21832ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEC170C5-5FCA-4483-899E-270B21832ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEC170C5-5FCA-4483-899E-270B21832ADF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

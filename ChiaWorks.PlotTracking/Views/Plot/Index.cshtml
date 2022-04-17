@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Plot List";
+}
+@model List<PlotInfo>
+
+@{
+    System.Diagnostics.Debug.Assert(Model != null, nameof(Model) + " != null");
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Address</th>
+        <th scope="col">Created On</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    @foreach (var item in Model)
+    {
+        @await Html.PartialAsync("_Item", item)
+    }
+    </tbody>
+</table>
