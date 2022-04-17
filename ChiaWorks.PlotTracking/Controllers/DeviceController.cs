@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Security.Authentication;
-using ChiaWorks.PlotTracking.Controllers.Api;
 using ChiaWorks.PlotTracking.Data;
+using ChiaWorks.PlotTracking.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +27,7 @@ public class DeviceController : Controller
         var user = await _userManager.FindByEmailAsync(User.Identity.Name);
         if (user == null) throw new AuthenticationException();
 
-        var isAdmin = await _userManager.IsInRoleAsync(user, WarmUpsController.AdminRoleName);
+        var isAdmin = await _userManager.IsInRoleAsync(user, UserService.AdminRoleName);
 
         var userDevices = _dbContext.UserDevices.AsQueryable()
             .Where(w => isAdmin || w.UserId.ToString() == user.Id)

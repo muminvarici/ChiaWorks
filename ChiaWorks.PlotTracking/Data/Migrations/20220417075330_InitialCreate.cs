@@ -64,7 +64,11 @@ namespace ChiaWorks.PlotTracking.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Plots");
 
+            migrationBuilder.DropTable(
+                name: "UserDevices");
         }
     }
 }

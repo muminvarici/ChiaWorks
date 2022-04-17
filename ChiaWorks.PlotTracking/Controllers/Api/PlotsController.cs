@@ -2,6 +2,7 @@ using ChiaWorks.PlotTracking.Data;
 using ChiaWorks.PlotTracking.Models;
 using ChiaWorks.PlotTracking.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChiaWorks.PlotTracking.Controllers.Api;
 
@@ -24,21 +25,22 @@ public class PlotsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] PlotCreateRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) ||
-            string.IsNullOrWhiteSpace(request.IpAddress))
+        if (string.IsNullOrWhiteSpace(request.Name))
             return BadRequest();
 
         var ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
 
         _logger.LogInformation("{ip} sent {name}", ip, request.Name);
 
+        await EnsureDeviceExistsAsync(ip);
+
         await _dbContext.Plots.AddAsync(new PlotInfo
         {
-            Name = request.Name, IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(), CreatedOn = DateTime.Now
+            Name = request.Name, IpAddress = ip, CreatedOn = DateTime.Now
         });
         var count = await _dbContext.SaveChangesAsync();
 
-        return count > 0 ? Ok() : new StatusCodeResult(500);
+        return count > 0 ? Ok() : UnprocessableEntity();
     }
 
 
@@ -46,21 +48,35 @@ public class PlotsController : ControllerBase
     public async Task<IActionResult> Post([FromBody] DeviceInitRequest request)
     {
         request.Files = request.Files.Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+
+        if (!request.Files.Any())
+            return BadRequest();
+
         var ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
 
         _logger.LogInformation("{ip} sent {length} items", ip, request.Files.Length);
 
-        if (request.Files.Any())
-            return BadRequest();
+        await EnsureDeviceExistsAsync(ip);
 
         var plots = request.Files.Select(w => new PlotInfo
         {
-            Name = w, IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(), CreatedOn = DateTime.Now
+            Name = w, IpAddress = ip, CreatedOn = DateTime.Now
         }).ToList();
 
         await _dbContext.Plots.AddRangeAsync(plots);
         var count = await _dbContext.SaveChangesAsync();
 
-        return count > 0 ? Ok() : new StatusCodeResult(500);
+        return count > 0 ? Ok() : UnprocessableEntity();
+    }
+
+    private async Task EnsureDeviceExistsAsync(string? ip)
+    {
+        if (!await _dbContext.UserDevices.AnyAsync(w => w.IpAddress == ip))
+        {
+            await _dbContext.UserDevices.AddAsync(new()
+            {
+                IpAddress = ip, CreatedOn = DateTime.Now
+            });
+        }
     }
 }

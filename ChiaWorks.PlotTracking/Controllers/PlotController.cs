@@ -1,12 +1,9 @@
 using System.Security.Authentication;
-using ChiaWorks.PlotTracking.Controllers.Api;
 using ChiaWorks.PlotTracking.Data;
-using ChiaWorks.PlotTracking.Settings;
-using Microsoft.AspNetCore.Authorization;
+using ChiaWorks.PlotTracking.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace ChiaWorks.PlotTracking.Controllers;
 
@@ -31,7 +28,7 @@ public class PlotController : Controller
         var user = await _userManager.FindByEmailAsync(User.Identity.Name);
         if (user == null) throw new AuthenticationException();
 
-        var isAdmin = await _userManager.IsInRoleAsync(user, WarmUpsController.AdminRoleName);
+        var isAdmin = await _userManager.IsInRoleAsync(user, UserService.AdminRoleName);
 
         List<string> userDevices = null;
         if (!isAdmin)

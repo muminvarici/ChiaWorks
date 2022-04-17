@@ -1,16 +1,9 @@
-@using ChiaWorks.PlotTracking.Controllers.Api
+@using ChiaWorks.PlotTracking.Services
 @model UserDevice
 
 
 <tr>
     <th scope="row">@Model.Id</th>
-    @if (User.IsInRole(WarmUpsController.AdminRoleName))
-    {
-        <td>@Model.IpAddress</td>
-    }
-    else
-    {
-        <td>@($"***.{Model.IpAddress.Remove(Model.IpAddress.LastIndexOf(".", StringComparison.Ordinal))}") </td>
-    }
+    <td>@Model.GetIpAddress(User.IsInRole(UserService.AdminRoleName))</td>
     <td>@Model.CreatedOn</td>
 </tr>

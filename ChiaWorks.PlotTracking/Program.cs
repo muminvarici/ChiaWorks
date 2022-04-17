@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ChiaWorks.PlotTracking.Data;
+using ChiaWorks.PlotTracking.Services;
 using ChiaWorks.PlotTracking.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +13,10 @@ builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection(na
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddScoped<UserService>();
 
 builder.Services
-    .AddDefaultIdentity<IdentityUser>(options => { options.SignIn.RequireConfirmedAccount = true; })
+    .AddDefaultIdentity<IdentityUser>(options => { options.SignIn.RequireConfirmedAccount = false; })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
@@ -55,12 +57,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-using (var scope =
-       app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 using (var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
 {
     if (context.Database.EnsureCreated())
         context.Database.Migrate();
+    var service = scope.ServiceProvider.GetRequiredService<UserService>();
+    service.Warmup().GetAwaiter().GetResult();
 }
 
 app.Run();

@@ -1,11 +1,12 @@
 @{
     ViewData["Title"] = "Plot List";
 }
-@using ChiaWorks.PlotTracking.Controllers.Api
+@using System.Diagnostics
+@using ChiaWorks.PlotTracking.Services
 @model List<PlotInfo>
 
 @{
-    System.Diagnostics.Debug.Assert(Model != null, nameof(Model) + " != null");
+    Debug.Assert(Model != null, nameof(Model) + " != null");
 }
 
 <table class="table">
@@ -13,7 +14,7 @@
     <tr>
         <th scope="col">#</th>
         <th scope="col">Name</th>
-        @if (User.IsInRole(WarmUpsController.AdminRoleName))
+        @if (User.IsInRole(UserService.AdminRoleName))
         {
             <th scope="col">Address</th>
         }

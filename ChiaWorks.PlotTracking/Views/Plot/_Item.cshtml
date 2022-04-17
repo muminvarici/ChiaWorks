@@ -1,11 +1,11 @@
-@using ChiaWorks.PlotTracking.Controllers.Api
+@using ChiaWorks.PlotTracking.Services
 @model PlotInfo
 
 
 <tr>
     <th scope="row">@Model.Id</th>
     <td>@Model.Name</td>
-    @if (User.IsInRole(WarmUpsController.AdminRoleName))
+    @if (User.IsInRole(UserService.AdminRoleName))
     {
         <td>@Model.IpAddress</td>
     }
