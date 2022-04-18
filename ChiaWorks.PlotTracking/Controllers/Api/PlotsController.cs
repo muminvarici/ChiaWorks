@@ -33,6 +33,8 @@ public class PlotsController : ControllerBase
         _logger.LogInformation("{ip} sent {name}", ip, request.Name);
 
         await EnsureDeviceExistsAsync(ip);
+        if (await _dbContext.Plots.AnyAsync(w => w.Name.Contains(request.Name) || request.Name.Contains(w.Name)))
+            return Conflict();
 
         await _dbContext.Plots.AddAsync(new PlotInfo
         {
@@ -58,10 +60,13 @@ public class PlotsController : ControllerBase
 
         await EnsureDeviceExistsAsync(ip);
 
-        var plots = request.Files.Select(w => new PlotInfo
-        {
-            Name = w, IpAddress = ip, CreatedOn = DateTime.Now
-        }).ToList();
+
+        var plots = request.Files
+            .Where(q => !_dbContext.Plots.Any(w => w.Name.Contains(q) || q.Contains(w.Name)))
+            .Select(w => new PlotInfo
+            {
+                Name = w, IpAddress = ip, CreatedOn = DateTime.Now
+            }).ToList();
 
         await _dbContext.Plots.AddRangeAsync(plots);
         var count = await _dbContext.SaveChangesAsync();
