@@ -29,15 +29,17 @@ public class HomeController : Controller
         return View(model);
     }
 
-    private Task<int[]> GetData(DateTime day, int itemCount)
+    private async Task<int[]> GetData(DateTime day, int itemCount)
     {
-        return _dbContext.Plots
+        var data = await _dbContext.Plots
             .AsQueryable()
             .Where(w => w.CreatedOn.Date > day.AddDays(-itemCount))
             .GroupBy(w => w.CreatedOn.Date)
             .OrderBy(w => w.Key)
             .Select(w => w.Count())
             .ToArrayAsync();
+
+        return new int [itemCount - data.Length].Concat(data).ToArray();
     }
 
     private string[] GetDaysOfWeek(DateTime day, int itemCount)
