@@ -1,8 +1,42 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@using System.Text.Json.Serialization
+@model HomeModel
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <canvas id="lineChart"></canvas>
+
+
 </div>
+
+@section Scripts
+{
+<script>
+//line
+var ctxL = document.getElementById("lineChart").getContext('2d');
+var myLineChart = new Chart(ctxL, {
+  type: 'line',
+  data: {
+    labels:  @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Labels)),
+    datasets: [{
+      label: "Daily plot count",
+      data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Data)),
+      backgroundColor: [
+        'rgba(105, 0, 132, .2)',
+      ],
+      borderColor: [
+        'rgba(200, 99, 132, .7)',
+      ],
+      borderWidth: 2
+    }
+    ]
+  },
+  options: {
+    responsive: true
+  }
+  });
+</script>
+}
