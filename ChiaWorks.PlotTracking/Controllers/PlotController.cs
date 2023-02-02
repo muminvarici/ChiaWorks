@@ -42,6 +42,7 @@ public class PlotController : Controller
         var plots = await _dbContext.Plots.AsQueryable()
             .Where(w => isAdmin || userDevices.Contains(w.IpAddress))
             .OrderByDescending(w => w.CreatedOn)
+            .Take(250)
             .ToListAsync();
 
         return View(plots);

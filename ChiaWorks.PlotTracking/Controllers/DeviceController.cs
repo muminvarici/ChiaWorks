@@ -29,7 +29,9 @@ public class DeviceController : Controller
 
         var isAdmin = await _userManager.IsInRoleAsync(user, UserService.AdminRoleName);
 
-        var userDevices = _dbContext.UserDevices.AsQueryable()
+        var userDevices = _dbContext.UserDevices
+            .Join(_dbContext.Plots,(x)=>x.IpAddress,y=>y.IpAddress,(x,y)=>)
+            .AsQueryable()
             .Where(w => isAdmin || w.UserId.ToString() == user.Id)
             .ToList();
 
